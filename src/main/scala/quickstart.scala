@@ -94,7 +94,7 @@ object Main {
         // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
         // val spreadsheetId = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
         val spreadsheetId = "1UN12o-LP3EFFw5VjeiP27om99_TmuFs3Pm9O1isinxY"
-        val range = "Form Responses 1!A2:E"
+        val range = "Form Responses 1!A2:K"
         val response : ValueRange = service.spreadsheets().values()
             .get(spreadsheetId, range)
             .execute()
