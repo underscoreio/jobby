@@ -1,14 +1,19 @@
+# Jobby
 
-- lambda, event triggered?
-  - be notified of an addition (or poll?)
-  - read last row (or rows since last done?)
-- apply to a template 
-- work out filename
-- add to git (PR)
+> "Yes, Harry Potter!” said Dobby at once, his great eyes shining with excitement. “And if Dobby does it wrong, Dobby will throw himself off the topmost tower, Harry Potter!”
 
-https://docs.google.com/spreadsheets/d/1UN12o-LP3EFFw5VjeiP27om99_TmuFs3Pm9O1isinxY/edit#gid=2115126140
+> “There won’t be any need for that,” said Harry hastily.”
 
-# References
+An adaptation of the Google Sheets "quick start" example to fetch a Google Spreadsheet of Job Opportunities and format them into a markdown file.
 
-- [Google Sheets API](https://developers.google.com/sheets/reference/rest/)
+## Usage
 
+You will need a `./src/main/resources/client_secret.json` as described in the [Google Quickstart Guide](https://developers.google.com/sheets/quickstart/java)
+
+Then:
+
+```
+sbt 'runMain io.underscore.jobby.Main 1UN12o-LP3EFFw5VjeiP27om99_TmuFs3Pm9O1isinxY "Form Responses 1!A2:K"'
+```
+
+... for example.

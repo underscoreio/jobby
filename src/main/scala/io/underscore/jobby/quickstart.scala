@@ -47,62 +47,59 @@ case class GoogleAuth(val clientSecretsPath: String = "/client_secret.json") ext
   val DATA_STORE_FACTORY : FileDataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR)
 
   def authorize(): Try[Credential] = Try {
-      // Load client secrets.
-      val in : InputStream = classOf[GoogleAuth].getResourceAsStream(clientSecretsPath)
-      val clientSecrets : GoogleClientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in))
+    // Load client secrets.
+    val in : InputStream = classOf[GoogleAuth].getResourceAsStream(clientSecretsPath)
+    val clientSecrets : GoogleClientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in))
 
-      // Build flow and trigger user authorization request.
-      val flow : GoogleAuthorizationCodeFlow =
-              new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-              .setDataStoreFactory(DATA_STORE_FACTORY)
-              .setAccessType("offline")
-              .build()
-      val credential : Credential = new AuthorizationCodeInstalledApp( flow, new LocalServerReceiver()).authorize("user")
-      System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath())
-      credential
+    // Build flow and trigger user authorization request.
+    val flow : GoogleAuthorizationCodeFlow =
+            new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+            .setDataStoreFactory(DATA_STORE_FACTORY)
+            .setAccessType("offline")
+            .build()
+    val credential : Credential = new AuthorizationCodeInstalledApp( flow, new LocalServerReceiver()).authorize("user")
+    System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath())
+    credential
   }
 }
 
 object Service extends GoogleConfig {
 
-    /** Application name. */
-    val APPLICATION_NAME = "Google Sheets API Java Quickstart"
+  /** Application name. */
+  val APPLICATION_NAME = "Google Sheets API Java Quickstart"
 
-    /**
-     * Build and return an authorized Sheets API client service.
-     * @return an authorized Sheets API client service
-     * @throws IOException
-     */
-    def sheets(credential: Credential) : Try[Sheets] = Try {
-      new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build()
-      }
+  /**
+   * Build and return an authorized Sheets API client service.
+   * @return an authorized Sheets API client service
+   * @throws IOException
+   */
+  def sheets(credential: Credential) : Try[Sheets] = Try {
+    new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build()
+  }
 }
 
 object Main {
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit = args match {
+    case Array(spreadsheetId, range) => 
+      fetch(spreadsheetId, range) match {
+        case Success(range) => dump(range)
+        case Failure(err) => println(err)
+      }
+    case _ => 
+      println("Usage: run spreadsheet-id cell-range")
+  }
 
-    val spreadsheetId = "1UN12o-LP3EFFw5VjeiP27om99_TmuFs3Pm9O1isinxY"
-    val range = "Form Responses 1!A2:K"
+  def fetch(spreadsheetId: String, range: String): Try[ValueRange] =
+    GoogleAuth().authorize.flatMap(Service.sheets).flatMap { service => 
+      Try { service.spreadsheets().values().get(spreadsheetId, range).execute() }
+    }
 
-    val response : Try[ValueRange] = 
-      GoogleAuth().authorize.flatMap(Service.sheets).flatMap { service => 
-        Try { 
-          service.spreadsheets().values()
-            .get(spreadsheetId, range)
-            .execute()
-          }
-        }
-
-
-    response match {
-      case Success(range) => 
-        val values : Seq[List[Object]] = range.getValues().asScala
-          if (values == null || values.size == 0) {
-              println("No data found.")
-          } else {
-            for (row <- values) { System.out.println(row) }
-          }
-      case Failure(ex) => println(ex)
+  def dump(range: ValueRange): Unit = {
+    val values : Seq[List[Object]] = range.getValues().asScala
+    if (values == null || values.size == 0) {
+        println("No data found.")
+    } else {
+      for (row <- values) { System.out.println(row) }
     }
   }
 }
