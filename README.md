@@ -1,10 +1,12 @@
 # Jobby
 
+Automation of converting spreadsheet data into markdown for job opportunities.
+
 > "Yes, Harry Potter!” said Dobby at once, his great eyes shining with excitement. “And if Dobby does it wrong, Dobby will throw himself off the topmost tower, Harry Potter!”
 
 > “There won’t be any need for that,” said Harry hastily.”
 
-An adaptation of the Google Sheets "quick start" example to fetch a Google Spreadsheet of Job Opportunities and format them into a markdown file.
+An adaptation of the Google Sheets "quick start" example.
 
 ## Usage
 
