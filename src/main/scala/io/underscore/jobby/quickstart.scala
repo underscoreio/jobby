@@ -79,6 +79,10 @@ object Service extends GoogleConfig {
 }
 
 object Main {
+
+  import java.time.{Instant, Period }
+  val lookback = Instant.now minus Period.ofDays(24)
+
   def main(args: Array[String]): Unit = args match {
     case Array(spreadsheetId, range) => 
       fetch(spreadsheetId, range) match {
@@ -86,7 +90,12 @@ object Main {
           import purecsv.safe._
           import Converters._
           val jobs: List[Try[Job]] = CSVReader[Job].readCSVFromString(asCSV(range))
-          println(jobs)
+          System.err.println("Failures: "+jobs.collect{case Failure(err) => err})
+          jobs.collect{
+            case Success(job) if job.timestamp isAfter lookback => 
+              println(IO.write(job))
+            }
+
         case Failure(err)   => println(err)
       }
     case _ => 
@@ -111,4 +120,5 @@ object Main {
     if (values == null || values.isEmpty) ""
     else values.map(rowToCSV).mkString("\n")
   }
+
 }
