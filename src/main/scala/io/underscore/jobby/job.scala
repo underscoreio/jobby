@@ -3,14 +3,13 @@ package io.underscore.jobby
 import java.time.Instant
 
 sealed trait RemoteWork
-case object Remote        extends RemoteWork
-case object PartialRemote extends RemoteWork
-case object OnSite        extends RemoteWork
+final case object Remote        extends RemoteWork
+final case object PartialRemote extends RemoteWork
+final case object OnSite        extends RemoteWork
 
 sealed trait ApplicationRoute
-case class ApplicationEmail(value: String) extends ApplicationRoute
-case class ApplicationURL(value: String)   extends ApplicationRoute
-
+final case class ApplicationEmail(value: String) extends ApplicationRoute
+final case class ApplicationURL(value: String)   extends ApplicationRoute
 
 case class Job(
   timestamp         : Instant,
