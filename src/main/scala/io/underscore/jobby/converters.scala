@@ -8,7 +8,7 @@ import java.time.Instant
 
 object Converters {
 
-  private val usDate = DateTimeFormatter.ofPattern("M/d/yyyy HH:mm:ss").withZone(ZoneId of "UTC")
+  private val usDate = DateTimeFormatter.ofPattern("M/d/yyyy H:mm:ss").withZone(ZoneId of "UTC")
 
   implicit val instantConverter = new StringConverter[Instant] {
     override def tryFrom(str: String): Try[Instant] = Try(Instant.from(usDate parse str))

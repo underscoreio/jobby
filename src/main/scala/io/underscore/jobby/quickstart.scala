@@ -18,7 +18,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.util.Arrays
-import java.util.List
+import java.util.{List => JList}
 
 import scala.collection.JavaConverters._
 import scala.util.{Try,Success,Failure}
@@ -82,8 +82,12 @@ object Main {
   def main(args: Array[String]): Unit = args match {
     case Array(spreadsheetId, range) => 
       fetch(spreadsheetId, range) match {
-        case Success(range) => dump(range)
-        case Failure(err) => println(err)
+        case Success(range) => 
+          import purecsv.safe._
+          import Converters._
+          val jobs: List[Try[Job]] = CSVReader[Job].readCSVFromString(asCSV(range))
+          println(jobs)
+        case Failure(err)   => println(err)
       }
     case _ => 
       println("Usage: run spreadsheet-id cell-range")
@@ -94,12 +98,17 @@ object Main {
       Try { service.spreadsheets().values().get(spreadsheetId, range).execute() }
     }
 
-  def dump(range: ValueRange): Unit = {
-    val values : Seq[List[Object]] = range.getValues().asScala
-    if (values == null || values.size == 0) {
-        println("No data found.")
-    } else {
-      for (row <- values) { System.out.println(row) }
+  def asCSV(range: ValueRange): String = {
+    // Madness. I'm converting individual cell values back into CSV format to parse them with CSVReader!
+    def cellToCSV(o: Object): String = {
+      val v = o.toString.replaceAll("\"", "\"\"")
+      s""""$v""""
     }
+
+    def rowToCSV(os: JList[Object]): String = os.asScala.map(cellToCSV).mkString(",")
+
+    val values : Seq[JList[Object]] = range.getValues().asScala
+    if (values == null || values.isEmpty) ""
+    else values.map(rowToCSV).mkString("\n")
   }
 }
