@@ -84,41 +84,29 @@ object Main {
   val lookback = Instant.now minus Period.ofDays(24)
 
   def main(args: Array[String]): Unit = args match {
-    case Array(spreadsheetId, range) => 
+    case Array(spreadsheetId, range) =>
       fetch(spreadsheetId, range) match {
-        case Success(range) => 
-          import purecsv.safe._
-          import Converters._
-          val jobs: List[Try[Job]] = CSVReader[Job].readCSVFromString(asCSV(range))
+        case Success(range) =>
+          import Read._
+          val jobs: List[Try[Job]] = asScala(range).map(Read.as[Job])
           System.err.println("Failures: "+jobs.collect{case Failure(err) => err})
           jobs.collect{
-            case Success(job) if job.timestamp isAfter lookback => 
+            case Success(job) if job.timestamp isAfter lookback =>
               println(IO.write(job))
             }
 
-        case Failure(err)   => println(err)
+        case Failure(err)   => err.printStackTrace()
       }
-    case _ => 
+    case _ =>
       println("Usage: run spreadsheet-id cell-range")
   }
 
   def fetch(spreadsheetId: String, range: String): Try[ValueRange] =
-    GoogleAuth().authorize.flatMap(Service.sheets).flatMap { service => 
+    GoogleAuth().authorize.flatMap(Service.sheets).flatMap { service =>
       Try { service.spreadsheets().values().get(spreadsheetId, range).execute() }
     }
 
-  def asCSV(range: ValueRange): String = {
-    // Madness. I'm converting individual cell values back into CSV format to parse them with CSVReader!
-    def cellToCSV(o: Object): String = {
-      val v = o.toString.replaceAll("\"", "\"\"")
-      s""""$v""""
-    }
-
-    def rowToCSV(os: JList[Object]): String = os.asScala.map(cellToCSV).mkString(",")
-
-    val values : Seq[JList[Object]] = range.getValues().asScala
-    if (values == null || values.isEmpty) ""
-    else values.map(rowToCSV).mkString("\n")
-  }
+  def asScala(range: ValueRange): List[List[String]] =
+    range.getValues().asScala.toList.map(row => row.asScala.toList.map(_.toString))
 
 }
