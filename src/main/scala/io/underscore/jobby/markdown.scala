@@ -32,7 +32,7 @@ object Markdown {
       |layout: job
       |title: ${job.position}
       |company: |
-      |  ${job.position}
+      |  ${job.companyName}
       |location: ${job.location}
       |level: ${job.level}
       |remote: ${remoteText(job)}
