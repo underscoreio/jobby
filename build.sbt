@@ -14,9 +14,9 @@ val scalatest = Seq("org.scalatest" %% "scalatest" % "3.0.0" % "test")
 
 val cats = Seq("org.typelevel" %% "cats" % "0.6.1")
 
-val csv = Seq("com.github.melrief" %% "purecsv" % "0.0.6")
+val shapeless = Seq("com.chuusai" %% "shapeless" % "2.3.2")
 
-libraryDependencies ++= google ++ scalatest ++ cats ++ csv
+libraryDependencies ++= google ++ scalatest ++ cats ++ shapeless
 
 scalacOptions ++= Seq(
   "-deprecation",
