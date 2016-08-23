@@ -1,5 +1,7 @@
 # Jobby
 
+[![Build Status](https://travis-ci.org/underscoreio/jobby.svg?branch=master)](https://travis-ci.org/underscoreio/jobby)
+
 Automation of converting spreadsheet data into markdown for job opportunities.
 
 > "Yes, Harry Potter!” said Dobby at once, his great eyes shining with excitement. “And if Dobby does it wrong, Dobby will throw himself off the topmost tower, Harry Potter!”
