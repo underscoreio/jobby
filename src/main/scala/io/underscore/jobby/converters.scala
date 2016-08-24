@@ -26,18 +26,24 @@ trait StringReader[T] {
   def read(s: String): Try[T]
 }
 
-trait Readers {
-
-  implicit val stringReader = new StringReader[String] {
-    def read(str: String): Try[String] = Success(str)
-  }
-
+object USDateReader {
   private val usDate = DateTimeFormatter
     .ofPattern("M/d/yyyy H:mm:ss")
     .withZone(ZoneId of "UTC")
 
   implicit val instantReader = new StringReader[Instant] {
     def read(str: String): Try[Instant] = Try(Instant.from(usDate parse str))
+  }
+}
+
+trait Readers {
+
+  implicit val stringReader = new StringReader[String] {
+    def read(str: String): Try[String] = Success(str)
+  }
+
+  implicit val intReader = new StringReader[Int] {
+    def read(str: String): Try[Int] = Try(Integer parseInt str)
   }
 
   implicit val workReader = new StringReader[RemoteWork] {

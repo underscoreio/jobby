@@ -87,7 +87,7 @@ object Main {
     case Array(spreadsheetId, range) =>
       fetch(spreadsheetId, range) match {
         case Success(range) =>
-          import Read._
+          import Read._, USDateReader._
           val jobs: List[Try[Job]] = asScala(range).map(Read.as[Job])
           System.err.println("Failures: "+jobs.collect{case Failure(err) => err})
           jobs.collect{
