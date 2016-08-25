@@ -79,6 +79,7 @@ object ScalaxMain {
       |
       |${talk.summary}
       |
+      |[Next>](../${talk.number + 1})
       |---
       |
       |${talk.author}
