@@ -7,7 +7,7 @@ import shapeless.{HNil, ::}
 
 class ConverterSpec extends FlatSpec with Matchers with TryValues {
 
-  import Read._
+  import Read._, USDateReader._
 
   "Converter" should "exist for (Instant,String)" in {
     val converter = implicitly[Converter[Instant :: String :: HNil]]

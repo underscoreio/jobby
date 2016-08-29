@@ -7,7 +7,7 @@ import shapeless._
 
 class ParsingSpec extends FlatSpec with Matchers {
 
-  import Read._
+  import Read._, USDateReader._
 
   "Parser" should "parse valid CSV row" in {
 
