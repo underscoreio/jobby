@@ -7,43 +7,31 @@ import scala.collection.JavaConverters._
 import scala.util.{Try,Success,Failure}
 
 case class Talk(
+  status         : String,
   number         : Int,
-  timestamp      : java.time.Instant,
   title          : String,
   summary        : String,
   talkType       : String,
   audienceLevel  : String,
   author         : String,
+  classification : String,
+  location       : String,
   email          : String,
   twitter        : String,
   plus           : String,
   phone          : String,
   organization   : String,
-  location       : String,
-  bio            : String,
-  assitance      : String,
-  notes          : String,
-  classification : String
+  locationAgain  : String,
+  bio            : String
 )
 
 
 object ScalaxMain {
 
-  import java.time.format.DateTimeFormatter
-  import java.time.ZoneId
-  import java.time.Instant
   import Read._
 
-  private val ukDate = DateTimeFormatter
-    .ofPattern("d/M/yyyy H:mm:ss")
-    .withZone(ZoneId of "UTC")
-
-  implicit val instantReader = new StringReader[Instant] {
-    def read(str: String): Try[Instant] = Try(Instant.from(ukDate parse str))
-  }
-
   def main(args: Array[String]): Unit =
-    fetch("1pI-BYpRlT1UiUMukyUytwdAv7uPFZHR147jLtN8hGDs", "CFPs!A2:Q") match {
+    fetch("1pI-BYpRlT1UiUMukyUytwdAv7uPFZHR147jLtN8hGDs", "CFPs!A2:P") match {
       case Failure(err)   => err.printStackTrace()
       case Success(range) =>
         val talks: List[Try[Talk]] = asScala(range).map(Read.as[Talk])
@@ -68,8 +56,7 @@ object ScalaxMain {
     val path = FileSystems.getDefault().getPath("/Users/richard/talks-92/scalax/content/post", name)
     val content = s"""
       |+++
-      |date = "${talk.timestamp.toString}"
-      |title = "${talk.number}. ${talk.title}"
+      |title = "${talk.number}. ${talk.status} ${talk.title}"
       |draft = false
       |+++
       |
@@ -83,6 +70,8 @@ object ScalaxMain {
       |---
       |
       |${talk.author}
+      |
+      |${talk.organization}
       |
       |${talk.bio}
       |
