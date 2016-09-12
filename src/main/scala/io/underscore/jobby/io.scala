@@ -18,7 +18,7 @@ object IO {
   }
 
   def slug(job: Job): String =
-    job.companyName.toLowerCase.replaceAll("\\W","-")
+    job.companyName.toLowerCase.trim.replaceAll("\\W","-")
 
   def write(job: Job): Try[Path] = Try {
     val path = filename(job)
