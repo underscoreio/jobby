@@ -10,13 +10,16 @@ val google = Seq(
   "com.google.apis"         % "google-api-services-sheets" % "v4-rev17-1.22.0"
 )
 
-val scalatest = Seq("org.scalatest" %% "scalatest" % "3.0.0" % "test")
+val testlibs = Seq(
+  "org.scalatest" %% "scalatest" % "3.0.0" % "test",
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.1" % "test"
+)
 
 val cats = Seq("org.typelevel" %% "cats" % "0.6.1")
 
 val shapeless = Seq("com.chuusai" %% "shapeless" % "2.3.2")
 
-libraryDependencies ++= google ++ scalatest ++ cats ++ shapeless
+libraryDependencies ++= google ++ testlibs ++ cats ++ shapeless
 
 scalacOptions ++= Seq(
   "-deprecation",
