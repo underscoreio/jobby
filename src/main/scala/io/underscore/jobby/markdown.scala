@@ -4,9 +4,9 @@ object Markdown {
 
   def instructionsText(job: Job): String =
     job.application match {
-      case ApplicationEmail(_) => 
+      case ApplicationEmail(_) =>
         """Use the button below to send us an email including your CV, the position you're applying for, and anything else you might want to say."""
-      case ApplicationURL(_)   => 
+      case ApplicationURL(_)   =>
         """Apply online. Click "Apply Now" below to get started."""
     }
 
@@ -23,8 +23,13 @@ object Markdown {
       case OnSite        => "No"
     }
 
-  def juniorMeta(job: Job): String = 
+  def juniorMeta(job: Job): String =
     if (job.level contains "Junior") "junior: true" else ""
+
+  def citizenMeta(job: Job): String = job.citizenship match {
+    case Some(c) => s"citizenship: |\n  $c"
+    case None    => ""
+  }
 
   def apply(job: Job): String =
       s"""
@@ -43,6 +48,7 @@ object Markdown {
       |instructions: |
       |  ${instructionsText(job)}
       |${juniorMeta(job)}
+      |${citizenMeta(job)}
       |---
       |
       |<!-- break -->

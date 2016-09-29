@@ -22,6 +22,7 @@ case class Job(
   description       : String,
   adminEmailAddress : String,
   newsletter        : String,
-  companyName       : String
+  companyName       : String,
+  citizenship       : Option[String] = None
 )
 
