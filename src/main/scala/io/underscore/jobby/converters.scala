@@ -20,6 +20,22 @@ of the Converter which is type List[String] => List[Try[T]].
 The result of a converter is flattened out into a Try[P] (for some case
 class, P) by Read.as.
 
+## Optional cells
+
+As the spreadsheet evolves by adding rows, we have a situation where...
+
+1. older rows will not have the new column.
+That is, we have rows returned will different lengths.
+
+2. for optional answers added to the spreadhsheet,
+if the answer is not given there is no cell returned by Google.
+Not even a blank value.
+Again, we have rows of different lengths.
+
+To handle these cases we support Option[T] values in the case class.
+If we "run out of values" when reading a row, but the cell is Optional,
+we treat that as None and carry one.
+
 */
 
 trait StringReader[T] {
@@ -68,14 +84,24 @@ trait Converter[T <: HList] {
 
 trait Converters {
 
-  implicit val c0 = new Converter[HNil] {
+  implicit val emptyListConverter = new Converter[HNil] {
     def convert(values: List[String]) = values match {
       case Nil => Success(HNil)
       case xs  => Failure(new Exception(s"Too many runtime values at: ${xs.head}"))
     }
   }
 
-  implicit def c1[H, T <: HList](implicit reader: StringReader[H], converter: Converter[T]) =
+  implicit def optionalValueConverter[H, T <: HList](implicit reader: StringReader[H], converter: Converter[T]) =
+    new Converter[Option[H] :: T] {
+      def convert(values: List[String]) =
+        if (values.isEmpty) converter.convert(Nil).map(tail => None :: tail)
+        else for {
+          h <- reader.read(values.head)
+          t <- converter.convert(values.tail)
+          } yield Some(h) :: t
+    }
+
+  implicit def listConverter[H, T <: HList](implicit reader: StringReader[H], converter: Converter[T]) =
     new Converter[H :: T] {
       def convert(values: List[String]) =
         if (values.isEmpty) Failure(new Exception(s"Not enough runtime values"))

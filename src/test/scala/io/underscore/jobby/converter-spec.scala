@@ -30,4 +30,11 @@ class ConverterSpec extends FlatSpec with Matchers with TryValues {
     )
   }
 
+  it should "Succeed if there are not enough values at runtime but the remaining fields are optional" in {
+    val converter = implicitly[Converter[String :: Option[String] :: HNil]]
+    converter.convert(List("x")).success.value should be(
+      "x" :: (None:Option[String]) :: HNil
+    )
+  }
+
 }
