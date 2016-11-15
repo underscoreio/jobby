@@ -1,5 +1,7 @@
 package io.underscore.jobby
 
+import java.time.Period
+
 object Markdown {
 
   def instructionsText(job: Job): String =
@@ -31,10 +33,16 @@ object Markdown {
     case None    => ""
   }
 
+  def expireMeta(job: Job): String = {
+    val maxage = Period.ofDays(31)
+    IO.dateFormat.format(job.timestamp plus maxage)
+  }
+
   def apply(job: Job): String =
       s"""
       |---
       |layout: job
+      |expire: ${expireMeta(job)}
       |title: ${job.position}
       |company: |
       |  ${job.companyName}
