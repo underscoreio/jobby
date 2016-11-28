@@ -2,9 +2,13 @@ package io.underscore.jobby
 
 import java.time.Period
 
+/*
+ * Jobs are represented in text as a markdown file with a YAML header.
+ * This class will format a job. It does a bad job of producing YAML.
+ */
 object Markdown {
 
-  def instructionsText(job: Job): String =
+  private def instructionsText(job: Job): String =
     job.application match {
       case ApplicationEmail(_) =>
         """Use the button below to send us an email including your CV, the position you're applying for, and anything else you might want to say."""
@@ -12,28 +16,28 @@ object Markdown {
         """Apply online. Click "Apply Now" below to get started."""
     }
 
-  def howToApplyMeta(job: Job): String =
+  private def howToApplyMeta(job: Job): String =
     job.application match {
       case ApplicationEmail(email) => s"email: $email"
       case ApplicationURL(url)     => s"application_url: $url"
     }
 
-  def remoteText(job: Job): String =
+  private def remoteText(job: Job): String =
     job.work match {
       case Remote        => "Yes"
       case PartialRemote => "Partial"
       case OnSite        => "No"
     }
 
-  def juniorMeta(job: Job): String =
+  private def juniorMeta(job: Job): String =
     if (job.level contains "Junior") "junior: true" else ""
 
-  def citizenMeta(job: Job): String = job.citizenship match {
+  private def citizenMeta(job: Job): String = job.citizenship match {
     case Some(c) => s"citizenship: |\n  $c"
     case None    => ""
   }
 
-  def expireMeta(job: Job): String = {
+  private def expireMeta(job: Job): String = {
     val maxage = Period.ofDays(31)
     IO.dateFormat.format(job.timestamp plus maxage)
   }

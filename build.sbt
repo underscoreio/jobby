@@ -2,7 +2,7 @@ name := "jobby"
 
 version := "1.0.0"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.0"
 
 val google = Seq(
   "com.google.api-client"   % "google-api-client"          % "1.22.0",
@@ -11,11 +11,11 @@ val google = Seq(
 )
 
 val testlibs = Seq(
-  "org.scalatest" %% "scalatest" % "3.0.0" % "test",
-  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.1" % "test"
+  "org.scalatest"              %% "scalatest"                 % "3.0.0" % "test",
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.3" % "test"
 )
 
-val cats = Seq("org.typelevel" %% "cats" % "0.6.1")
+val cats = Seq("org.typelevel" %% "cats" % "0.8.1")
 
 val shapeless = Seq("com.chuusai" %% "shapeless" % "2.3.2")
 
@@ -29,6 +29,7 @@ scalacOptions ++= Seq(
   "-language:implicitConversions",
   "-language:postfixOps",
   "-Ywarn-dead-code",
+  "-Ywarn-value-discard",
   "-Xlint",
   "-Xfatal-warnings"
 )

@@ -22,7 +22,11 @@ import java.util.{List => JList}
 
 import scala.collection.JavaConverters._
 import scala.util.{Try,Success,Failure}
-
+/**
+ * This is the entry point for running a job conversion.
+ * It is the Google example code base modified to process jobs.
+ * It is not well named or structured: feel free to improve it.
+ */
 trait GoogleConfig {
   /** Global instance of the JSON factory. */
   val JSON_FACTORY = JacksonFactory.getDefaultInstance()
@@ -83,6 +87,8 @@ object Main {
   import java.time.{Instant, Period }
   val lookback = Instant.now minus Period.ofDays(24)
 
+  import java.nio.file.Path
+
   def main(args: Array[String]): Unit = args match {
     case Array(spreadsheetId, range) =>
       fetch(spreadsheetId, range) match {
@@ -90,10 +96,10 @@ object Main {
           import Read._, USDateReader._
           val jobs: List[Try[Job]] = asScala(range).map(Read.as[Job])
           System.err.println("Failures: "+jobs.collect{case Failure(err) => err})
-          jobs.collect{
-            case Success(job) if job.timestamp isAfter lookback =>
-              println(IO.write(job))
-            }
+          val results: List[Try[Path]] = jobs.collect{
+            case Success(job) if job.timestamp isAfter lookback => IO.write(job)
+          }
+          results.foreach(println)
 
         case Failure(err)   => err.printStackTrace()
       }

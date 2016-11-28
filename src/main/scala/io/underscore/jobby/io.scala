@@ -6,6 +6,10 @@ import java.nio.file.{FileSystems, Path, Files}
 import java.nio.charset.Charset
 import scala.util.Try
 
+/*
+ The purpose of this file is to deal with I/O related tasks,
+ such as generating a filename and writing a Job to the filesystem.
+*/
 object IO {
 
   val dateFormat = DateTimeFormatter
