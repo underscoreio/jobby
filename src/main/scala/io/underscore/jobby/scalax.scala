@@ -7,6 +7,7 @@ case class Talk(
   number         : Int,
   timestamp      : String,
   title          : String,
+  status         : String,
   talkType       : String,
   summary        : String,
   audienceLevel  : String,
@@ -16,7 +17,7 @@ case class Talk(
 
 object Config {
   val sheetId = "1pI-BYpRlT1UiUMukyUytwdAv7uPFZHR147jLtN8hGDs"
-  val sheetRange = "CFP!A2:H"
+  val sheetRange = "CFP!A2:I"
   val outDir = "/Users/richard/tmp/cfp/content/post"
 }
 
@@ -85,6 +86,7 @@ object ScalaxMain {
       |draft = false
       |+++
       |
+      |- Status: ${talk.status}
       |- ${talk.talkType}
       |- ${talk.classification}
       |- ${talk.audienceLevel}
