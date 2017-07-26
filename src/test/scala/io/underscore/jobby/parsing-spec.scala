@@ -1,9 +1,8 @@
 package io.underscore.jobby
 
 import org.scalatest._
-import scala.util.{ Try, Success, Failure }
+import scala.util.{ Success, Failure }
 import java.time.Instant
-import shapeless._
 
 class ParsingSpec extends FlatSpec with Matchers {
 

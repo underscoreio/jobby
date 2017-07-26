@@ -1,7 +1,6 @@
 package io.underscore.jobby
 
 import org.scalatest._
-import scala.util.{ Success, Failure }
 import java.time.Instant
 import shapeless.{HNil, ::}
 
