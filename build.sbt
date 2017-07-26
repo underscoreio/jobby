@@ -2,7 +2,7 @@ name := "jobby"
 
 version := "1.0.0"
 
-scalaVersion := "2.12.0"
+scalaVersion := "2.12.2"
 
 val google = Seq(
   "com.google.api-client"   % "google-api-client"          % "1.22.0",
