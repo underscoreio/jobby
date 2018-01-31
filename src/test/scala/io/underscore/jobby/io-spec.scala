@@ -1,7 +1,7 @@
 package io.underscore.jobby
 
 import org.scalatest._
-import org.scalacheck.Shapeless._
+import org.scalacheck.ScalacheckShapeless._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 
