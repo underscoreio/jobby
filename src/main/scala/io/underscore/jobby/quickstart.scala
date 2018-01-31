@@ -8,17 +8,13 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
-import com.google.api.client.json.JsonFactory
 import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.sheets.v4.SheetsScopes
 import com.google.api.services.sheets.v4.model._
 import com.google.api.services.sheets.v4.Sheets
 
-import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.util.Arrays
-import java.util.{List => JList}
 
 import scala.collection.JavaConverters._
 import scala.util.{Try,Success,Failure}
@@ -42,7 +38,7 @@ case class GoogleAuth(val clientSecretsPath: String = "/client_secret.json") ext
    * If modifying these scopes, delete your previously saved credentials
    * at ~/.credentials/sheets.googleapis.com-java-quickstart
    */
-  val SCOPES = Arrays.asList(SheetsScopes.SPREADSHEETS_READONLY)
+  val SCOPES = java.util.Arrays.asList(SheetsScopes.SPREADSHEETS_READONLY)
 
   /** Directory to store user credentials for this application. */
   val DATA_STORE_DIR = new java.io.File( System.getProperty("user.home"), ".credentials/sheets.googleapis.com-java-quickstart")

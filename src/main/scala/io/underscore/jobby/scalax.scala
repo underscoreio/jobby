@@ -1,8 +1,5 @@
 package io.underscore.jobby
 
-import java.util.Arrays
-import java.util.{List => JList}
-
 import scala.collection.JavaConverters._
 import scala.util.{Try,Success,Failure}
 
