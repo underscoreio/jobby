@@ -32,6 +32,16 @@ object Markdown {
   private def juniorMeta(job: Job): String =
     if (job.level contains "Junior") "junior: true" else ""
 
+  private def contract(job: Job): String =
+    job.contract match {
+      case None    => "Permanent" // default assumption for historic jobs before we asked the question
+      case Some(c) => c match {
+        case Contractor   => "Contractor only"
+        case Permanent    => "Permanent employment"
+        case ConsiderBoth => "Will consider permanent role and contractor"
+      }
+    }
+
   private def citizenMeta(job: Job): String = job.citizenship match {
     case Some(c) => s"citizenship: |\n  $c"
     case None    => ""
@@ -53,6 +63,7 @@ object Markdown {
       |location: ${job.location}
       |level: ${job.level}
       |remote: ${remoteText(job)}
+      |contract: ${contract(job)}
       |summary: |
       |  ${job.summary}
       |admin: ${job.adminEmailAddress}

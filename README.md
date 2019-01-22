@@ -17,7 +17,7 @@ You will need a `./src/main/resources/client_secret.json` as described in the [G
 Then:
 
 ```
-sbt 'runMain io.underscore.jobby.Main 1UN12o-LP3EFFw5VjeiP27om99_TmuFs3Pm9O1isinxY "Form Responses 1!A2:K"'
+sbt 'runMain io.underscore.jobby.Main 1UN12o-LP3EFFw5VjeiP27om99_TmuFs3Pm9O1isinxY "Form Responses 1!A2:M"'
 ```
 
 ... for example.
