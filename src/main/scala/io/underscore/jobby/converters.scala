@@ -71,6 +71,15 @@ trait Readers {
     }
   }
 
+  implicit val contractReader = new StringReader[Contract] {
+    def read(str: String): Try[Contract] = str match {
+      case "Contract"                            => Success(Contractor)
+      case "Permanent"                           => Success(Permanent)
+      case "Will consider permanent or contract" => Success(ConsiderBoth)
+      case x                                     => Failure(new Exception(s"$x is not a valid Contract"))
+    }
+  }
+
   implicit val routeReader = new StringReader[ApplicationRoute] {
     def read(s: String): Try[ApplicationRoute] = Try(
       if (s contains "@") ApplicationEmail(s) else ApplicationURL(s)
