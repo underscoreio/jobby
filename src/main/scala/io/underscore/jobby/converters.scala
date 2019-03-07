@@ -139,12 +139,15 @@ object Read extends Converters with Readers {
 
   import scala.reflect.Generic
   import scala.compiletime.erasedValue
+  import scala.compiletime.Shape._
 
   inline def derived[P] given (ev: Generic[P]) = new Read[P] {
     def read(row: List[String]): Try[P] = {
+        Failure(new Exception("recurse"))
+      /*
       inline erasedValue[ev.Shape] match {
-        case _ =>  Failure(new Exception("no"))
-      }
+        case _: Case[_, elems] =>  Failure(new Exception("recurse"))
+      }*/
     }
   }
 

@@ -1,13 +1,15 @@
 package io.underscore.jobby
 
-import org.scalatest._
 import scala.util.{ Success, Failure }
 import java.time.Instant
+import org.junit.Test
+import org.junit.Assert._
 
-class ParsingSpec extends FlatSpec with Matchers {
+class ParsingSpec {
 
-  import Read._, USDateReader._
+  import Read._
 
+  /*
   "Parser" should "parse valid CSV row" in {
 
     val row: List[String] = """
@@ -44,5 +46,6 @@ class ParsingSpec extends FlatSpec with Matchers {
   it should "fail on invalid CSV rows" in {
     Read.as[Job](List("wibble")) shouldBe a [Failure[_]]
   }
+  */
 
 }

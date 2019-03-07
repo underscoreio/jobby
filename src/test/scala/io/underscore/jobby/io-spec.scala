@@ -1,24 +1,40 @@
 package io.underscore.jobby
 
-import org.scalatest._
-import org.scalacheck.ScalacheckShapeless._
-import org.scalacheck.Arbitrary
-import org.scalacheck.Arbitrary.arbitrary
+import org.junit.Test
+import org.junit.Assert._
 
-class IOSpec extends FlatSpec with Matchers {
+class IOSpec {
 
   import java.time.Instant
+  /*
+  import org.scalacheck.Arbitrary
+  import org.scalacheck.Arbitrary.arbitrary
+
   implicit lazy val arbInst: Arbitrary[Instant] = Arbitrary(
     arbitrary[Long].map(Instant.ofEpochMilli)
   )
 
   def jobWithCompany(co: String): Option[Job] =
     arbitrary[Job].sample.map(job => job.copy(companyName = co))
-    
+  */
 
-  "IO.slug" should "trim whitespace from company name" in {
-    jobWithCompany("Foo co ").map(IO.slug) shouldBe Some("foo-co")
-  }
+  def jobWithCompany(co: String): Option[Job] = Some(
+    Job(
+      Instant.now(),
+      "Position",
+      "Location",
+      RemoteWork.OnSite,
+      "Level",
+      ApplicationRoute.ApplicationURL("http://example.org"),
+      "Summary",
+      "Description",
+      "adminEmailAddress",
+      "Newsletter",
+      co,
+    )
+  )
 
+  @Test def `Slug should trim whitespace from company name` =
+    assertEquals(Some("foo-co"), jobWithCompany("Foo co ").map(IO.slug))
 
 }
