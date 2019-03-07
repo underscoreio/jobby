@@ -1,6 +1,7 @@
 package io.underscore.jobby
 
 import java.time.Period
+import ApplicationRoute._, RemoteWork._, Contract._
 
 /*
  * Jobs are represented in text as a markdown file with a YAML header.

@@ -1,5 +1,7 @@
 package io.underscore.jobby
 
+import scala.language.implicitConversions
+
 import com.google.api.client.auth.oauth2.Credential
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver
@@ -17,7 +19,7 @@ import java.io.InputStream
 import java.io.InputStreamReader
 
 import scala.collection.JavaConverters._
-import scala.util.{Try,Success,Failure}
+import scala.util.{Try,Success,Failure   }
 /**
  * This is the entry point for running a job conversion.
  * It is the Google example code base modified to process jobs.
@@ -84,13 +86,20 @@ object Main {
   val lookback = Instant.now minus Period.ofDays(24)
 
   import java.nio.file.Path
+  import Read._
+
+  def convert (range: ValueRange) given (reader: Read[Job]): List[Try[Job]] = {
+    val scalaRange: List[List[String]] =
+      range.getValues().asScala.toList.map(row => row.asScala.toList.map(_.toString))
+
+    scalaRange.map(reader.read)
+  }
 
   def main(args: Array[String]): Unit = args match {
     case Array(spreadsheetId, range) =>
       fetch(spreadsheetId, range) match {
         case Success(range) =>
-          import Read._, USDateReader._
-          val jobs: List[Try[Job]] = asScala(range).map(Read.as[Job])
+          val jobs = convert(range)
           System.err.println("Failures: "+jobs.collect{case Failure(err) => err})
           val results: List[Try[Path]] = jobs.collect{
             case Success(job) if job.timestamp isAfter lookback => IO.write(job)
@@ -104,11 +113,9 @@ object Main {
   }
 
   def fetch(spreadsheetId: String, range: String): Try[ValueRange] =
-    GoogleAuth().authorize.flatMap(Service.sheets).flatMap { service =>
+    GoogleAuth().authorize().flatMap(Service.sheets).flatMap { service =>
       Try { service.spreadsheets().values().get(spreadsheetId, range).execute() }
     }
 
-  def asScala(range: ValueRange): List[List[String]] =
-    range.getValues().asScala.toList.map(row => row.asScala.toList.map(_.toString))
 
 }

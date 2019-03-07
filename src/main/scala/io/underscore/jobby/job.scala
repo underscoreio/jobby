@@ -16,19 +16,18 @@ import java.time.Instant
  * The custom case classes have String => T methods defined in `converters.scala`.
  */
 
-sealed trait RemoteWork
-final case object Remote        extends RemoteWork
-final case object PartialRemote extends RemoteWork
-final case object OnSite        extends RemoteWork
+enum RemoteWork {
+  case Remote, PartialRemote, OnSite
+}
 
-sealed trait Contract
-final case object Permanent    extends Contract
-final case object Contractor   extends Contract
-final case object ConsiderBoth extends Contract
+enum Contract {
+  case Permanent, Contractor, ConsiderBoth
+}
 
-sealed trait ApplicationRoute
-final case class ApplicationEmail(value: String) extends ApplicationRoute
-final case class ApplicationURL(value: String)   extends ApplicationRoute
+enum ApplicationRoute {
+  case ApplicationEmail(value: String)
+  case ApplicationURL(value: String)
+}
 
 case class Job(
   timestamp         : Instant,
@@ -44,5 +43,5 @@ case class Job(
   companyName       : String,
   citizenship       : Option[String] = None,
   contract          : Option[Contract] = None,
-)
+) derives Read
 

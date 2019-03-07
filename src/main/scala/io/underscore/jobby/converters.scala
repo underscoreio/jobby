@@ -5,8 +5,6 @@ import java.time.format.DateTimeFormatter
 import java.time.ZoneId
 import java.time.Instant
 
-import shapeless._
-
 /*
 
 We need to be able to read single String cells from the spreadsheet
@@ -14,7 +12,7 @@ as particular types, such as Instant.
 This is represented as the StringReader which is String => Try[T]
 
 We also want to be able to convert a List of String cell values
-from the spreadhseet into case classes.  This is the role
+from the spreadsheet into case classes.  This is the role
 of the Converter which is type List[String] => List[Try[T]].
 
 The result of a converter is flattened out into a Try[P] (for some case
@@ -34,7 +32,7 @@ Again, we have rows of different lengths.
 
 To handle these cases we support Option[T] values in the case class.
 If we "run out of values" when reading a row, but the cell is Optional,
-we treat that as None and carry one.
+we treat that as None and carry on.
 
 */
 
@@ -42,57 +40,59 @@ trait StringReader[T] {
   def read(s: String): Try[T]
 }
 
-object USDateReader {
-  private val usDate = DateTimeFormatter
-    .ofPattern("M/d/yyyy H:mm:ss")
-    .withZone(ZoneId of "UTC")
-
-  implicit val instantReader = new StringReader[Instant] {
-    def read(str: String): Try[Instant] = Try(Instant.from(usDate parse str))
-  }
-}
-
 trait Readers {
 
-  implicit val stringReader = new StringReader[String] {
+  implied USDateReader for StringReader[Instant] {
+    val usDate = DateTimeFormatter
+      .ofPattern("M/d/yyyy H:mm:ss")
+      .withZone(ZoneId of "UTC")
+
+    def read(str: String): Try[Instant] = 
+      Try(Instant.from(usDate parse str))
+  }
+
+  implied stringReader for StringReader[String] {
     def read(str: String): Try[String] = Success(str)
   }
 
-  implicit val intReader = new StringReader[Int] {
+  implied intReader for StringReader[Int] {
     def read(str: String): Try[Int] = Try(Integer parseInt str)
   }
 
-  implicit val workReader = new StringReader[RemoteWork] {
+  implied workReader for StringReader[RemoteWork] {
     def read(str: String): Try[RemoteWork] = str match {
-      case "Yes"     => Success(Remote)
-      case "Partial" => Success(PartialRemote)
-      case "No"      => Success(OnSite)
+      case "Yes"     => Success(RemoteWork.Remote)
+      case "Partial" => Success(RemoteWork.PartialRemote)
+      case "No"      => Success(RemoteWork.OnSite)
       case x         => Failure(new Exception(s"$x is not valid RemoteWork"))
     }
   }
 
-  implicit val contractReader = new StringReader[Contract] {
+  implied contractReader for StringReader[Contract] {
     def read(str: String): Try[Contract] = str match {
-      case "Contract"                            => Success(Contractor)
-      case "Permanent"                           => Success(Permanent)
-      case "Will consider permanent or contract" => Success(ConsiderBoth)
+      case "Contract"                            => Success(Contract.Contractor)
+      case "Permanent"                           => Success(Contract.Permanent)
+      case "Will consider permanent or contract" => Success(Contract.ConsiderBoth)
       case x                                     => Failure(new Exception(s"$x is not a valid Contract"))
     }
   }
 
-  implicit val routeReader = new StringReader[ApplicationRoute] {
+  implied routeReader for StringReader[ApplicationRoute] {
+    import ApplicationRoute._
     def read(s: String): Try[ApplicationRoute] = Try(
       if (s contains "@") ApplicationEmail(s) else ApplicationURL(s)
     )
   }
 }
 
+/*
 trait Converter[T <: HList] {
   def convert(values: List[String]): Try[T]
 }
+*/
 
 trait Converters {
-
+/*
   implicit val emptyListConverter = new Converter[HNil] {
     def convert(values: List[String]) = values match {
       case Nil => Success(HNil)
@@ -128,12 +128,28 @@ trait Converters {
     (implicit gen: Generic.Aux[P,H], converter: Converter[H]) = new ProductConverter[P] {
       def read(row: List[String]) = converter.convert(row).map(gen.from)
   }
+*/
+}
+
+trait Read[P] {
+  def read(row: List[String]): Try[P]
 }
 
 object Read extends Converters with Readers {
 
-  def as[P](row: List[String])(implicit converter: ProductConverter[P]): Try[P] =
-    converter.read(row)
+  import scala.reflect.Generic
+  import scala.compiletime.erasedValue
+
+  inline def derived[P] given (ev: Generic[P]) = new Read[P] {
+    def read(row: List[String]): Try[P] = {
+      inline erasedValue[ev.Shape] match {
+        case _ =>  Failure(new Exception("no"))
+      }
+    }
+  }
+
+  // Or instead of `...derives Read` on `Job`, we could:
+  // implied [P] given Generic[P] for Read[P] = Read.derived
 
 }
 

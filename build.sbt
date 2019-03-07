@@ -1,37 +1,20 @@
-name := "jobby"
+val dottyVersion = "0.14.0-bin-20190306-9f5b3c3-NIGHTLY" // Until https://github.com/lampepfl/dotty/issues/5924 lands
 
-version := "1.0.0"
+lazy val root = project
+  .in(file("."))
+  .settings(
+    name := "jobby",
+    version := "2.0.0",
 
-scalaVersion := "2.12.4"
+    scalaVersion := dottyVersion,
+
+    libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test",
+    libraryDependencies ++= google
+  )
 
 val google = Seq(
   "com.google.api-client"   % "google-api-client"          % "1.23.0",
   "com.google.oauth-client" % "google-oauth-client-jetty"  % "1.23.0",
   "com.google.apis"         % "google-api-services-sheets" % "v4-rev17-1.22.0"
-)
-
-val testlibs = Seq(
-  "org.scalatest"              %% "scalatest"                 % "3.0.5" % "test",
-  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.8" % "test"
-)
-
-val cats = Seq("org.typelevel" %% "cats-core" % "1.0.1")
-
-val shapeless = Seq("com.chuusai" %% "shapeless" % "2.3.3")
-
-libraryDependencies ++= google ++ testlibs ++ cats ++ shapeless
-
-scalacOptions ++= Seq(
-  "-deprecation",
-  "-encoding", "UTF-8",
-  "-unchecked",
-  "-feature",
-  "-language:implicitConversions",
-  "-language:postfixOps",
-  "-Ywarn-dead-code",
-  "-Ywarn-value-discard",
-  "-Xlint",
-  "-Xfatal-warnings",
-  "-Ypartial-unification"
 )
 
