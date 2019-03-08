@@ -86,7 +86,7 @@ object Main {
   val lookback = Instant.now minus Period.ofDays(24)
 
   import java.nio.file.Path
-  import Read._
+  import implied Read._
 
   def convert (range: ValueRange) given (reader: Read[Job]): List[Try[Job]] = {
     val scalaRange: List[List[String]] =
