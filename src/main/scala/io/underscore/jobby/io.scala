@@ -9,7 +9,7 @@ import scala.util.Try
 /*
  The purpose of this file is to deal with I/O related tasks,
  such as generating a filename and writing a Job to the filesystem.
-*/
+ */
 object IO {
 
   val dateFormat = DateTimeFormatter
@@ -22,13 +22,14 @@ object IO {
   }
 
   def slug(job: Job): String =
-    job.companyName.toLowerCase.trim.replaceAll("\\W","-")
+    job.companyName.toLowerCase.trim.replaceAll("\\W", "-")
 
   def write(job: Job): Try[Path] = Try {
     val path = filename(job)
     val content = Markdown(job)
     val w = Files.newBufferedWriter(path, Charset.forName("UTF-8"))
-    try w.write(content) finally w.close
+    try w.write(content)
+    finally w.close
     path
   }
 

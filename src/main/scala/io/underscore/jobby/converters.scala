@@ -1,6 +1,6 @@
 package io.underscore.jobby
 
-import scala.util.{ Success, Failure, Try }
+import scala.util.{Success, Failure, Try}
 import java.time.format.DateTimeFormatter
 import java.time.ZoneId
 import java.time.Instant
@@ -36,7 +36,7 @@ To handle these cases we support Option[T] values in the case class.
 If we "run out of values" when reading a row, but the cell is Optional,
 we treat that as None and carry one.
 
-*/
+ */
 
 trait StringReader[T] {
   def read(s: String): Try[T]
@@ -96,27 +96,36 @@ trait Converters {
   implicit val emptyListConverter = new Converter[HNil] {
     def convert(values: List[String]) = values match {
       case Nil => Success(HNil)
-      case xs  => Failure(new Exception(s"Too many runtime values at: ${xs.head}"))
+      case xs =>
+        Failure(new Exception(s"Too many runtime values at: ${xs.head}"))
     }
   }
 
-  implicit def optionalValueConverter[H, T <: HList](implicit reader: StringReader[H], converter: Converter[T]) =
+  implicit def optionalValueConverter[H, T <: HList](
+      implicit reader: StringReader[H],
+      converter: Converter[T]
+  ) =
     new Converter[Option[H] :: T] {
       def convert(values: List[String]) =
         if (values.isEmpty) converter.convert(Nil).map(tail => None :: tail)
-        else for {
-          h <- reader.read(values.head)
-          t <- converter.convert(values.tail)
+        else
+          for {
+            h <- reader.read(values.head)
+            t <- converter.convert(values.tail)
           } yield Some(h) :: t
     }
 
-  implicit def listConverter[H, T <: HList](implicit reader: StringReader[H], converter: Converter[T]) =
+  implicit def listConverter[H, T <: HList](
+      implicit reader: StringReader[H],
+      converter: Converter[T]
+  ) =
     new Converter[H :: T] {
       def convert(values: List[String]) =
         if (values.isEmpty) Failure(new Exception(s"Not enough runtime values"))
-        else for {
-          h <- reader.read(values.head)
-          t <- converter.convert(values.tail)
+        else
+          for {
+            h <- reader.read(values.head)
+            t <- converter.convert(values.tail)
           } yield h :: t
     }
 
@@ -124,16 +133,19 @@ trait Converters {
     def read(row: List[String]): Try[P]
   }
 
-  implicit def deriveAs[P <: Product, H <: HList]
-    (implicit gen: Generic.Aux[P,H], converter: Converter[H]) = new ProductConverter[P] {
-      def read(row: List[String]) = converter.convert(row).map(gen.from)
+  implicit def deriveAs[P <: Product, H <: HList](
+      implicit gen: Generic.Aux[P, H],
+      converter: Converter[H]
+  ) = new ProductConverter[P] {
+    def read(row: List[String]) = converter.convert(row).map(gen.from)
   }
 }
 
 object Read extends Converters with Readers {
 
-  def as[P](row: List[String])(implicit converter: ProductConverter[P]): Try[P] =
+  def as[P](
+      row: List[String]
+  )(implicit converter: ProductConverter[P]): Try[P] =
     converter.read(row)
 
 }
-
