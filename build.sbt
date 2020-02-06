@@ -4,7 +4,6 @@ version := "1.0.0"
 
 scalaVersion := "2.13.1"
 
-
 resolvers += ("google" at "https://dl.google.com/dl/android/maven2/")
 
 val google = Seq(
@@ -22,7 +21,9 @@ val cats = Seq("org.typelevel" %% "cats-core" % "2.1.0")
 
 val shapeless = Seq("com.chuusai" %% "shapeless" % "2.3.3")
 
-libraryDependencies ++= google ++ testlibs ++ cats ++ shapeless
+val yaml = Seq("org.yaml" % "snakeyaml" % "1.25")
+
+libraryDependencies ++= google ++ testlibs ++ cats ++ shapeless ++ yaml
 
 scalacOptions ++= Seq(
   "-deprecation",
