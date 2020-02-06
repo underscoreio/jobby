@@ -16,7 +16,7 @@ import com.google.api.services.sheets.v4.Sheets
 import java.io.InputStream
 import java.io.InputStreamReader
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.{Try,Success,Failure}
 /**
  * This is the entry point for running a job conversion.
