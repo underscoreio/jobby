@@ -20,5 +20,8 @@ class IOSpec extends FlatSpec with Matchers {
     jobWithCompany("Foo co ").map(IO.slug) shouldBe Some("foo-co")
   }
 
+  it should "not repeat a dash" in {
+    jobWithCompany("Foo Inc - Foo co").map(IO.slug) shouldBe Some("foo-inc-foo-co")
+  }
 
 }
