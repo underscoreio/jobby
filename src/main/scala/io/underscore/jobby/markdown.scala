@@ -12,7 +12,7 @@ object Markdown {
     job.application match {
       case ApplicationEmail(_) =>
         """Use the button below to send us an email including your CV, the position you're applying for, and anything else you might want to say."""
-      case ApplicationURL(_)   =>
+      case ApplicationURL(_) =>
         """Apply online. Click "Apply Now" below to get started."""
     }
 
@@ -34,12 +34,14 @@ object Markdown {
 
   private def contract(job: Job): String =
     job.contract match {
-      case None    => "Permanent" // default assumption for historic jobs before we asked the question
-      case Some(c) => c match {
-        case Contractor   => "Contractor only"
-        case Permanent    => "Permanent employment"
-        case ConsiderBoth => "Will consider permanent role and contractor"
-      }
+      case None =>
+        "Permanent" // default assumption for historic jobs before we asked the question
+      case Some(c) =>
+        c match {
+          case Contractor   => "Contractor only"
+          case Permanent    => "Permanent employment"
+          case ConsiderBoth => "Will consider permanent role and contractor"
+        }
     }
 
   private def citizenMeta(job: Job): String = job.citizenship match {
@@ -53,7 +55,7 @@ object Markdown {
   }
 
   def apply(job: Job): String =
-      s"""
+    s"""
       |---
       |layout: job
       |expire: ${expireMeta(job)}

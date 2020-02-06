@@ -17,48 +17,67 @@ import java.io.InputStream
 import java.io.InputStreamReader
 
 import scala.jdk.CollectionConverters._
-import scala.util.{Try,Success,Failure}
+import scala.util.{Try, Success, Failure}
+
 /**
- * This is the entry point for running a job conversion.
- * It is the Google example code base modified to process jobs.
- * It is not well named or structured: feel free to improve it.
- */
+  * This is the entry point for running a job conversion.
+  * It is the Google example code base modified to process jobs.
+  * It is not well named or structured: feel free to improve it.
+  */
 trait GoogleConfig {
+
   /** Global instance of the JSON factory. */
   val JSON_FACTORY = JacksonFactory.getDefaultInstance()
 
   /** Global instance of the HTTP transport. */
-  val HTTP_TRANSPORT : HttpTransport = GoogleNetHttpTransport.newTrustedTransport()
+  val HTTP_TRANSPORT: HttpTransport =
+    GoogleNetHttpTransport.newTrustedTransport()
 }
 
-case class GoogleAuth(val clientSecretsPath: String = "/client_secret.json") extends GoogleConfig {
+case class GoogleAuth(val clientSecretsPath: String = "/client_secret.json")
+    extends GoogleConfig {
 
   /** Global instance of the scopes required by this quickstart.
-   *
-   * If modifying these scopes, delete your previously saved credentials
-   * at ~/.credentials/sheets.googleapis.com-java-quickstart
-   */
+    *
+    * If modifying these scopes, delete your previously saved credentials
+    * at ~/.credentials/sheets.googleapis.com-java-quickstart
+    */
   val SCOPES = java.util.Arrays.asList(SheetsScopes.SPREADSHEETS_READONLY)
 
   /** Directory to store user credentials for this application. */
-  val DATA_STORE_DIR = new java.io.File( System.getProperty("user.home"), ".credentials/sheets.googleapis.com-java-quickstart")
+  val DATA_STORE_DIR = new java.io.File(
+    System.getProperty("user.home"),
+    ".credentials/sheets.googleapis.com-java-quickstart"
+  )
 
   /** Global instance of the {@link FileDataStoreFactory}. */
-  val DATA_STORE_FACTORY : FileDataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR)
+  val DATA_STORE_FACTORY: FileDataStoreFactory = new FileDataStoreFactory(
+    DATA_STORE_DIR
+  )
 
   def authorize(): Try[Credential] = Try {
     // Load client secrets.
-    val in : InputStream = classOf[GoogleAuth].getResourceAsStream(clientSecretsPath)
-    val clientSecrets : GoogleClientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in))
+    val in: InputStream =
+      classOf[GoogleAuth].getResourceAsStream(clientSecretsPath)
+    val clientSecrets: GoogleClientSecrets =
+      GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in))
 
     // Build flow and trigger user authorization request.
-    val flow : GoogleAuthorizationCodeFlow =
-            new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-            .setDataStoreFactory(DATA_STORE_FACTORY)
-            .setAccessType("offline")
-            .build()
-    val credential : Credential = new AuthorizationCodeInstalledApp( flow, new LocalServerReceiver()).authorize("user")
-    System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath())
+    val flow: GoogleAuthorizationCodeFlow =
+      new GoogleAuthorizationCodeFlow.Builder(
+        HTTP_TRANSPORT,
+        JSON_FACTORY,
+        clientSecrets,
+        SCOPES
+      ).setDataStoreFactory(DATA_STORE_FACTORY)
+        .setAccessType("offline")
+        .build()
+    val credential: Credential =
+      new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver())
+        .authorize("user")
+    System.out.println(
+      "Credentials saved to " + DATA_STORE_DIR.getAbsolutePath()
+    )
     credential
   }
 }
@@ -69,18 +88,20 @@ object Service extends GoogleConfig {
   val APPLICATION_NAME = "Google Sheets API Java Quickstart"
 
   /**
-   * Build and return an authorized Sheets API client service.
-   * @return an authorized Sheets API client service
-   * @throws IOException
-   */
-  def sheets(credential: Credential) : Try[Sheets] = Try {
-    new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build()
+    * Build and return an authorized Sheets API client service.
+    * @return an authorized Sheets API client service
+    * @throws IOException
+    */
+  def sheets(credential: Credential): Try[Sheets] = Try {
+    new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+      .setApplicationName(APPLICATION_NAME)
+      .build()
   }
 }
 
 object Main {
 
-  import java.time.{Instant, Period }
+  import java.time.{Instant, Period}
   val lookback = Instant.now minus Period.ofDays(24)
 
   import java.nio.file.Path
@@ -91,13 +112,15 @@ object Main {
         case Success(range) =>
           import Read._, USDateReader._
           val jobs: List[Try[Job]] = asScala(range).map(Read.as[Job])
-          System.err.println("Failures: "+jobs.collect{case Failure(err) => err})
-          val results: List[Try[Path]] = jobs.collect{
+          System.err.println("Failures: " + jobs.collect {
+            case Failure(err) => err
+          })
+          val results: List[Try[Path]] = jobs.collect {
             case Success(job) if job.timestamp isAfter lookback => IO.write(job)
           }
           results.foreach(println)
 
-        case Failure(err)   => err.printStackTrace()
+        case Failure(err) => err.printStackTrace()
       }
     case _ =>
       println("Usage: run spreadsheet-id cell-range")
@@ -105,10 +128,16 @@ object Main {
 
   def fetch(spreadsheetId: String, range: String): Try[ValueRange] =
     GoogleAuth().authorize.flatMap(Service.sheets).flatMap { service =>
-      Try { service.spreadsheets().values().get(spreadsheetId, range).execute() }
+      Try {
+        service.spreadsheets().values().get(spreadsheetId, range).execute()
+      }
     }
 
   def asScala(range: ValueRange): List[List[String]] =
-    range.getValues().asScala.toList.map(row => row.asScala.toList.map(_.toString))
+    range
+      .getValues()
+      .asScala
+      .toList
+      .map(row => row.asScala.toList.map(_.toString))
 
 }
