@@ -25,6 +25,7 @@ object IO {
     job.companyName.toLowerCase.trim
       .replaceAll("\\W", "-")
       .replaceAll("-[-]+", "-")
+      .replaceAll("-+$", "")
 
   def write(job: Job): Try[Path] = Try {
     val path = filename(job)
